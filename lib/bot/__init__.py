@@ -16,7 +16,8 @@ from ..db import db
 
 PREFIX = "+"
 OWNER_IDS = [805261413702041621]
-COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
+#COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
+COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 
