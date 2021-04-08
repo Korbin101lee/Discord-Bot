@@ -50,13 +50,15 @@ class Bot(BotBase):
         super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS,intents=Intents.all())
 
     async def process_commands(self, message):
-        ctx = await self.get_context(message, cls=Context)
-        if ctx.command is not None and ctx.guild is not None:
-            if self.ready:
-                await self.invoke(ctx)
+    	ctx = await self.get_context(message, cls=Context)
 
-        else:
-            await ctx.send("I'm not ready to recieve commands. Please wait a few seconds.")
+    	if ctx.command is not None and ctx.guild is not None:
+
+    		if not self.ready:
+    			await ctx.send("I'm not ready to receive commands. Please wait a few seconds.")
+
+    		else:
+    			await self.invoke(ctx)
 
     def setup(self):
         for cog in COGS:
