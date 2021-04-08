@@ -20,6 +20,7 @@ OWNER_IDS = [805261413702041621]
 COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
+TOKEN_TWO = "ODI3OTg2MjE5NDU5MTQ5OTA1.YGjAQQ.B-kl3xS5NmIsIdQzTIHqUWRGWvM"
 
 class Ready(object):
     def __init__(self):
@@ -69,11 +70,11 @@ class Bot(BotBase):
         print("running setup...")
         self.setup()
 
-        with open("./lib/bot/token.0", "r", encoding="utf-8") as tf:
-            self.TOKEN = tf.read()
+       # with open("./lib/bot/token.0", "r", encoding="utf-8") as tf:
+          #  self.TOKEN = tf.read()
         
         print("running bot...")
-        super().run(self.TOKEN, reconnect=True)
+        super().run(TOKEN_TWO, reconnect=True)
 
     async def rules_reminder(self):
         await self.stdout.send("Remember to adhere to the rules! ")
