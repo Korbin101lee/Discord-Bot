@@ -3,9 +3,11 @@ from datetime import datetime
 from glob import glob
 from pathlib import Path
 
+from discord.ext.commands import when_mentioned_or, command, has_permissions
+
 from discord import Intents
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from discord import Embed, File
+from discord import Embed, File, DMChannel
 from discord.errors import HTTPException, Forbidden
 from discord.ext.commands import Context
 from discord.ext.commands import Bot as BotBase
@@ -14,14 +16,28 @@ from apscheduler.triggers.cron import CronTrigger
 
 from ..db import db
 
-PREFIX = "+"
+
 OWNER_IDS = [805261413702041621]
 #COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
 COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 TOKEN_TWO = "ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo"
-#ODI3OTg2MjE5NDU5MTQ5OTA1.YGjAQQ.B-kl3xS5NmIsIdQzTIHqUWRGWvM
+#Pro-Life client ID: ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo
+#Bot-Testing client ID: ODI3OTg2MjE5NDU5MTQ5OTA1.YGjAQQ.B-kl3xS5NmIsIdQzTIHqUWRGWvM
+GUILD_ID = 808447993891389465
+#Pro-Life server ID: 808447993891389465
+#Bot-Testing Server ID: 827970047297323019
+STD_OUT = 808447994928037890
+#Pro-Life channel ID: 808447994928037890
+#Bot-Testing channel ID: 829448814048968714
+
+
+def get_prefix(bot, message):
+	prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+    
+	return when_mentioned_or(prefix)(bot, message)
+
 
 class Ready(object):
     def __init__(self):
@@ -39,7 +55,6 @@ class Ready(object):
 
 class Bot(BotBase):
     def __init__(self):
-        self.PREFIX = PREFIX
         self.ready = False
         self.cogs_ready = Ready()
         
@@ -47,7 +62,7 @@ class Bot(BotBase):
         self.shceduler = AsyncIOScheduler()
 
         db.autosave(self.shceduler)
-        super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS,intents=Intents.all())
+        super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS,intents=Intents.all())
 
     async def process_commands(self, message):
     	ctx = await self.get_context(message, cls=Context)
@@ -81,6 +96,7 @@ class Bot(BotBase):
 
     async def rules_reminder(self):
         await self.stdout.send("Remember to adhere to the rules! ")
+
 
     async def on_connect(self):
         print(" bot connected")
@@ -121,15 +137,14 @@ class Bot(BotBase):
 
     async def on_ready(self):
         if not self.ready:
-            self.guild = self.get_guild(808447993891389465)
-            self.stdout = self.get_channel(808447994928037890)
+            self.guild = self.get_guild(GUILD_ID)
+            self.stdout = self.get_channel(STD_OUT)
             self.shceduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.shceduler.start()
 
 
             while not self.cogs_ready.all_ready():
                 await sleep(0.5)
-
             await self.stdout.send("Now online!")
             self.ready = True
             print(" bot ready")
@@ -138,9 +153,31 @@ class Bot(BotBase):
             print("bot reconnected")
 
     async def on_message(self, message):
-        
         if not message.author.bot:
-            await self.process_commands(message)
+            if isinstance(message.channel, DMChannel):
+                #if len(message.content) < 50:
+                    #await message.channel.send("Your message should be at least 50 characters in length.")
+
+                #else:
+                member = self.guild.get_member(message.author.id)
+                embed = Embed(title="Modmail",
+                              color=member.color,
+                              timestamp = datetime.utcnow())
+
+                embed.set_thumbnail(url=member.avatar_url)
+
+                fields = [("Member", member.display_name, False),
+                        ("Message", message.content, False)]
+
+                for name, value, inline in fields:
+                    embed.add_field(name=name, value=value, inline=inline)
+
+                mod = bot.get_cog("Mod")
+                await mod.log_channel.send(embed=embed)
+                await message.channel.send("Message relayed to moderators.")
+
+            else:
+                await self.process_commands(message)
 
     
 
