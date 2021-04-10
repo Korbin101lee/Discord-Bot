@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from re import search
 from typing import Optional
 
+from better_profanity import profanity
 from discord import Embed, Member, NotFound, Object
 from discord.utils import find
 from discord.ext.commands import Cog, Greedy, Converter
@@ -10,6 +11,9 @@ from discord.ext.commands import CheckFailure, BadArgument
 from discord.ext.commands import command, has_permissions, bot_has_permissions
 
 from ..db import db
+
+
+profanity.load_censor_words_from_file("./data/profanity.txt")
 
 
 class Mod(Cog):
@@ -202,16 +206,40 @@ class Mod(Cog):
         else:
             await self.unmute(ctx, targets, reason=reason)
 
+    @command(name="addprofanity", aliases=["addswears", "addcurses"])
+    @has_permissions(manage_guild=True)
+    async def add_progranity(self, ctx, *words):
+        with open("./data/profanity.txt", "a", encoding="utf-8") as f:
+            f.write("".join([f"{w}\n" for w in words]))
+
+        await ctx.send("Action complete.")
+
+    @command(name="delprofanity", aliases=["delswears", "delcurses"])
+    @has_permissions(manage_guild=True)
+    async def remove_profanity(self, ctx, *words):
+        with open("./data/profanity.txt", "r", encoding="utf-8") as f:
+            stored= f.readlines()
+            with open("./data/profanity.txt", "a", encoding="utf-8") as f:
+                f.write("".join([f"{w}\n" for w in stored if w not in words]))
+
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(808563375944106074)
+            self.log_channel = self.bot.get_channel(828785261449445486)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
-            self.mute_role = self.bot.guild.get_role(809094530631991297)
+            self.mute_role = self.bot.guild.get_role(830127409008869397)
             #pro life mute role: 809094530631991297
             #testing bot mute role: 830127409008869397
             self.bot.cogs_ready.ready_up("mod")
+
+
+    @Cog.listener()
+    async def on_message(self, message):
+        if not message.author.bot:
+            if profanity.contains_profanity(message.content):
+                await message.delete()
+                await message.channel.send("You can't use that word here.")
 
 
 def setup(bot):

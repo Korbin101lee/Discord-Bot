@@ -12,7 +12,7 @@ class Log(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(808563375944106074)
+            self.log_channel = self.bot.get_channel(828785261449445486)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
             self.bot.cogs_ready.ready_up("log")
@@ -64,7 +64,7 @@ class Log(Cog):
                           timestamp=datetime.utcnow())
 
             fields = [("Before", before.display_name, False),
-					  ("After", after.display_name, False)]
+                      ("After", after.display_name, False)]
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
@@ -77,7 +77,7 @@ class Log(Cog):
                           timestamp=datetime.utcnow())
 
             fields = [("Before", " ".join([r.mention for r in before.roles]), False),
-					  ("After", " ".join([r.mention for r in after.roles]), False)]
+                      ("After", " ".join([r.mention for r in after.roles]), False)]
 
             for name, value, inline in fields:
                 embed.add_field(name=name, value=value, inline=inline)
@@ -90,16 +90,17 @@ class Log(Cog):
         if not after.author.bot:
             if before.content != after.content:
                 embed = Embed(title="Message edit",
-                              color=after.author.color,
+                              description=f"Edit by {after.author.display_name}.",
+                              colour=after.author.colour,
                               timestamp=datetime.utcnow())
 
-            fields = [("Before", before.content, False),
-					  ("After", after.content, False)]
+                fields = [("Before", before.content, False),
+                          ("After", after.content, False)]
 
-            for name, value, inline in fields:
-                embed.add_field(name=name, value=value, inline=inline)
+                for name, value, inline in fields:
+                    embed.add_field(name=name, value=value, inline=inline)
 
-            await self.log_channel.send(embed=embed)
+                await self.log_channel.send(embed=embed)
 
             
 

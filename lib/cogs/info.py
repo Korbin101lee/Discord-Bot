@@ -50,7 +50,7 @@ class Info(Cog):
                                 len(list(filter(lambda m: str(m.status) == "offline", ctx.guild.members)))]
 
 
-        fields = [("ID", ctx.guild.owner, True),
+        fields = [("ID", ctx.guild.id, True),
                   ("Owner", ctx.guild.owner, True),
                   ("Region", ctx.guild.region, True),
                   ("Create at", ctx.guild.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
