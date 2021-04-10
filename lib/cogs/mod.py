@@ -225,10 +225,10 @@ class Mod(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(828785261449445486)
+            self.log_channel = self.bot.get_channel(808563375944106074)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
-            self.mute_role = self.bot.guild.get_role(830127409008869397)
+            self.mute_role = self.bot.guild.get_role(809094530631991297)
             #pro life mute role: 809094530631991297
             #testing bot mute role: 830127409008869397
             self.bot.cogs_ready.ready_up("mod")

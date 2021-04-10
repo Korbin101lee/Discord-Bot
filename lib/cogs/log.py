@@ -12,7 +12,7 @@ class Log(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(828785261449445486)
+            self.log_channel = self.bot.get_channel(808563375944106074)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
             self.bot.cogs_ready.ready_up("log")
