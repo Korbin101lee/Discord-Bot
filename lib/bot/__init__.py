@@ -17,6 +17,8 @@ from apscheduler.triggers.cron import CronTrigger
 from ..db import db
 
 
+
+
 OWNER_IDS = [805261413702041621]
 #COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
 COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
@@ -147,7 +149,7 @@ class Bot(BotBase):
 
             while not self.cogs_ready.all_ready():
                 await sleep(0.5)
-            await self.stdout.send("Now online!")
+            #await self.stdout.send("Now online!")
             self.ready = True
             print(" bot ready")
             

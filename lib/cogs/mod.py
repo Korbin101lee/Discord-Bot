@@ -2,6 +2,9 @@ from asyncio import sleep
 from datetime import datetime, timedelta
 from re import search
 from typing import Optional
+import json
+import os
+import discord
 
 from better_profanity import profanity
 from discord import Embed, Member, NotFound, Object
@@ -9,12 +12,40 @@ from discord.utils import find
 from discord.ext.commands import Cog, Greedy, Converter
 from discord.ext.commands import CheckFailure, BadArgument
 from discord.ext.commands import command, has_permissions, bot_has_permissions
+import re
 
-from ..db import db
+if os.path.exists(os.getcwd() + "./data/profanity.json"):
+
+    with open("./data/profanity.json") as f:
+        configData = json.load(f)
+
+else:
+    configTemplate = {"bannedWords": []}
+
+    with open(os.getcwd() + "/config.json", "w+") as f:
+        json.dump(configTemplate, f)
+
+bannedWords = configData["bannedWords"]
+
+import json
+  
+# create a sample json
+  
+a = {"name" : "GeeksforGeeks", "Topic" : "Json to String", "Method": 1}
+  
+# Convert JSON to String
+  
+y = json.dumps(bannedWords)
+  
+print(y)
+print(type(y))
 
 
-profanity.load_censor_words_from_file("./data/profanity.txt")
+profanity.load_censor_words_from_file("./data/profanity.json")
 
+
+def msg_contains_word(msg, word):
+    return re.search(fr'\b({word})\b', msg) is not None
 
 class Mod(Cog):
     def __init__(self, bot):
@@ -33,6 +64,7 @@ class Mod(Cog):
             for target in targets:
                 if (ctx.guild.me.top_role.position > target.top_role.position 
                     and not target.guild_permissions.administrator):
+                    await target.send(f"You got kicked for: {reason} by {ctx.author.name}")
                     await target.kick(reason=reason)
 
                     embed = Embed(title="Member kicked",
@@ -49,6 +81,7 @@ class Mod(Cog):
                         embed.add_field(name=name, value=value, inline=inline)
 
                     await self.log_channel.send(embed=embed)
+
 
                 else:
                     await ctx.send(f"{target.display_name} could not be kicked.")
@@ -72,6 +105,7 @@ class Mod(Cog):
             for target in targets:
                 if (ctx.guild.me.top_role.position > target.top_role.position 
                     and not target.guild_permissions.administrator):
+                    await target.send(f"You got banned for: {reason} by {ctx.author.name}")
                     await target.ban(reason=reason)
 
                     embed = Embed(title="Member banned",
@@ -86,6 +120,9 @@ class Mod(Cog):
 
                     for name, value, inline in fields:
                         embed.add_field(name=name, value=value, inline=inline)
+
+                    await target.send(f"You got banned for {reason} by {ctx.author.name}")
+
 
                     await self.log_channel.send(embed=embed)
                 else:
@@ -208,19 +245,51 @@ class Mod(Cog):
 
     @command(name="addprofanity", aliases=["addswears", "addcurses"])
     @has_permissions(manage_guild=True)
-    async def add_progranity(self, ctx, *words):
-        with open("./data/profanity.txt", "a", encoding="utf-8") as f:
-            f.write("".join([f"{w}\n" for w in words]))
+    async def add_profanity(self, ctx, words):
+        if words.lower() in bannedWords:
+            await ctx.send("Already banned.")
+        else:
+            bannedWords.append(words.lower())
 
-        await ctx.send("Action complete.")
+            with open("./data/profanity.json", "r+") as f:
+                data = json.load(f)
+                data["bannedWords"] = bannedWords
+                f.seek(0)
+                f.write(json.dumps(data))
+                f.truncate()
+                print(f)
+                print(data)
+
+            #await ctx.message.delete()
+            #await ctx.send("Word added to banned words.")
+
+            
+
+            #profanity.load_censor_words_from_file("./data/profanity.json")
+            #print(profanity)
+            await ctx.send("word added.")
 
     @command(name="delprofanity", aliases=["delswears", "delcurses"])
     @has_permissions(manage_guild=True)
-    async def remove_profanity(self, ctx, *words):
-        with open("./data/profanity.txt", "r", encoding="utf-8") as f:
-            stored= f.readlines()
-            with open("./data/profanity.txt", "a", encoding="utf-8") as f:
-                f.write("".join([f"{w}\n" for w in stored if w not in words]))
+    async def remove_profanity(self, ctx, words):
+        if words.lower() in bannedWords:
+            bannedWords.remove(words.lower())
+
+            with open("./data/profanity.json", "r+") as f:
+                data = json.load(f)
+                data["bannedWords"] = bannedWords
+                f.seek(0)
+                f.write(json.dumps(data))
+                f.truncate()
+
+            #await ctx.message.delete()
+            #await ctx.send("Word added to banned words.")
+
+            #profanity.load_censor_words_from_file("./data/profanity.json")
+            #print(profanity)
+            await ctx.send("word removed.")
+        else:
+            await ctx.send("Word isn't banned.")
 
     @Cog.listener()
     async def on_ready(self):
@@ -236,10 +305,12 @@ class Mod(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
-        if not message.author.bot:
-            if profanity.contains_profanity(message.content):
-                await message.delete()
-                await message.channel.send("You can't use that word here.")
+        messageAuthor = message.author
+        if bannedWords != None and (isinstance(message.channel, discord.channel.DMChannel) == False):
+            for bannedWord in bannedWords:
+                if msg_contains_word(message.content.lower(), bannedWord):
+                    await message.channel.send(f"{messageAuthor.mention} your message was removed as it contained a banned word.", delete_after=10)
+                    await message.delete()
 
 
 def setup(bot):
