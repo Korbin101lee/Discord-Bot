@@ -5,6 +5,7 @@ from typing import Optional
 import json
 import os
 import discord
+from pathlib import Path
 
 from better_profanity import profanity
 from discord import Embed, Member, NotFound, Object
@@ -14,16 +15,17 @@ from discord.ext.commands import CheckFailure, BadArgument
 from discord.ext.commands import command, has_permissions, bot_has_permissions
 import re
 
-#if os.path.exists(os.getcwd() + "./data/profanity.json"):
+mySexyPath = Path(__file__) / 'data' / 'profanity.json'
 
-with open("./data/profanity.json") as f:
-    configData = json.load(f)
+if mySexyPath.exists():
+    with open("./data/profanity.json") as f:
+        configData = json.load(f)
 
-#else:
-#    configTemplate = {"bannedWords": []}
+else:
+    configTemplate = {"bannedWords": []}
 
-#    with open(os.getcwd() + "/config.json", "w+") as f:
-#        json.dump(configTemplate, f)
+    with open(os.getcwd() + "/config.json", "w+") as f:
+        json.dump(configTemplate, f)
 
 bannedWords = configData["bannedWords"]
 
