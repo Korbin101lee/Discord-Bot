@@ -169,7 +169,7 @@ class Bot(BotBase):
         if not self.ready:
             self.guild = self.get_guild(GUILD_ID)
             self.stdout = self.get_channel(STD_OUT)
-            self.shceduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
+            #self.shceduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.shceduler.start()
 
 

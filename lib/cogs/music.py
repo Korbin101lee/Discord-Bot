@@ -5,6 +5,7 @@ import re
 import typing as t
 from enum import Enum
 
+import spotify.sync
 import discord
 import wavelink
 from discord.ext import commands
@@ -35,6 +36,10 @@ class NoTracksFound(commands.CommandError):
 
 
 class PlayerIsAlreadyPaused(commands.CommandError):
+    pass
+
+
+class PlayerIsAlreadyPlaying(commands.CommandError):
     pass
 
 
@@ -109,7 +114,7 @@ class Queue:
                 self.position = 0
             else:
                 return None
-
+        
         return self._queue[self.position]
 
     def shuffle(self):
@@ -304,7 +309,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await player.teardown()
         await ctx.send("Disconnect.")
 
-    @commands.command(name="play")
+    @commands.command(name="play", aliases=["p"])
     async def play_command(self, ctx, *, query: t.Optional[str]):
         player = self.get_player(ctx)
 
@@ -347,7 +352,22 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if isinstance(exc, PlayerIsAlreadyPaused):
             await ctx.send("Already paused.")
 
-    @commands.command(name="stop")
+    @commands.command(name="resume")
+    async def resume_command(self, ctx):
+        player = self.get_player(ctx)
+
+        if not player.is_paused:
+            raise PlayerIsAlreadyPlaying
+
+        await player.set_pause(False)
+        await ctx.send("Playback resumed.")
+
+    @resume_command.error
+    async def resume_command_error(self, ctx, exc):
+        if isinstance(exc, PlayerIsAlreadyPlaying):
+            await ctx.send("Already playing.")
+
+    @commands.command(name="stop", aliases=["clear"])
     async def stop_command(self, ctx):
         player = self.get_player(ctx)
         player.queue.empty()
@@ -380,7 +400,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         await ctx.send(embed=embed)
         #await ctx.send(f"{getattr(player.queue.current_track)}")
 
-    @commands.command(name="next", aliases=["skip"])
+    @commands.command(name="next", aliases=["skip", "fs"])
     async def next_command(self, ctx):
         player = self.get_player(ctx)
 
@@ -435,7 +455,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         player.queue.set_repeat_mode(mode)
         await ctx.send(f"The repeat mode has been set to {mode}.")
 
-    @commands.command(name="queue")
+    @commands.command(name="queue", aliases=["q"])
     async def queue_command(self, ctx, show: t.Optional[int] = 10):
         player = self.get_player(ctx)
 

@@ -111,7 +111,7 @@ class Mod(Cog):
         if isinstance(exc, CheckFailure):
             await ctx.send("Insufficient permissions to perform that task.")
 
-    @command(name="clear", aliases=["purge"])
+    @command(name="purge")
     @bot_has_permissions(manage_messages=True)
     @has_permissions(manage_messages=True)
     async def clear_messages(self, ctx, targets:Greedy[Member], limit: Optional[int] = 1):
