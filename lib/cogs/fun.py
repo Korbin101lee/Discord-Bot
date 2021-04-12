@@ -106,10 +106,10 @@ class Fun(Cog):
         await ctx.send(embed=embed)
 
 
-    @Cog.listener()
-    async def on_ready(self):
-        if not self.bot.ready:
-            self.bot.cogs_ready.ready_up("fun")
+    #@Cog.listener()
+    #async def on_ready(self):
+        #if not self.bot.ready:
+            #self.bot.cogs_ready.ready_up("fun")
 
 
 def setup(bot):

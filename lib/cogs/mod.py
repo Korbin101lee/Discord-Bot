@@ -15,17 +15,10 @@ from discord.ext.commands import CheckFailure, BadArgument
 from discord.ext.commands import command, has_permissions, bot_has_permissions
 import re
 
-mySexyPath = Path(__file__) / 'data' / 'profanity.json'
 
-if mySexyPath.exists():
-    with open("./data/profanity.json") as f:
-        configData = json.load(f)
+with open("./data/profanity.json") as f:
+    configData = json.load(f)
 
-else:
-    configTemplate = {"bannedWords": []}
-
-    with open(os.getcwd() + "/config.json", "w+") as f:
-        json.dump(configTemplate, f)
 
 bannedWords = configData["bannedWords"]
 
@@ -58,37 +51,28 @@ class Mod(Cog):
     @command(name="kick")
     @bot_has_permissions(kick_members=True)
     @has_permissions(kick_members=True)
-    async def kick_members(self, ctx, targets: Greedy[Member], *, reason: Optional[str] = "No reason provided."):
-        if not len(targets):
-            await ctx.send("One or more required arguments are missing.")
+    async def kick_members(self, ctx, user: Member, *, reason: Optional[str] = "No reason provided."):
+        if (ctx.guild.me.top_role.position > user.top_role.position 
+            and not user.guild_permissions.administrator):
+            await user.send(f"You got Kicked for: {reason} by <@{ctx.author.id}>")
+            await user.kick(reason=reason)
+
+            embed = Embed(title=f"User Kicked | {user}",
+                        color=0xDD2222,
+                        timestamp=datetime.utcnow())
+
+            embed=discord.Embed(title=f"User Kicked | {user}", color=0xdd2222, timestamp=datetime.utcnow())
+            embed.set_thumbnail(url=user.avatar_url)
+            embed.add_field(name="User", value=f"<@{user.id}>", inline=True)
+            embed.add_field(name="Moderator", value=f"<@{ctx.author.id}>", inline=True)
+            embed.add_field(name="Reason", value="reason", inline=True)
+            embed.set_footer(text=f"ID: {user.id}")
+            await self.log_channel.send(embed=embed)
 
         else:
-            for target in targets:
-                if (ctx.guild.me.top_role.position > target.top_role.position 
-                    and not target.guild_permissions.administrator):
-                    await target.send(f"You got kicked for: {reason} by {ctx.author.name}")
-                    await target.kick(reason=reason)
+            await ctx.send(f"{user.display_name} could not be kicked.")
 
-                    embed = Embed(title="Member kicked",
-                                color=0xDD2222,
-                                timestamp=datetime.utcnow())
-
-                    embed.set_thumbnail(url=target.avatar_url)
-
-                    fields = [("Member", f"{target.name} a.k.a {target.display_name}", False),
-                            ("Actioned by", ctx.author.display_name, False),
-                            ("Reason", reason, False)]
-
-                    for name, value, inline in fields:
-                        embed.add_field(name=name, value=value, inline=inline)
-
-                    await self.log_channel.send(embed=embed)
-
-
-                else:
-                    await ctx.send(f"{target.display_name} could not be kicked.")
-
-            await ctx.send("Action complete.")
+        await ctx.send("Action complete.")
 
 
     @kick_members.error
@@ -99,38 +83,28 @@ class Mod(Cog):
     @command(name="ban")
     @bot_has_permissions(ban_members=True)
     @has_permissions(ban_members=True)
-    async def ban_members(self, ctx, targets: Greedy[Member], *, reason: Optional[str] = "No reason provided."):
-        if not len(targets):
-            await ctx.send("One or more required arguments are missing.")
+    async def ban_members(self, ctx, user: Member, *, reason: Optional[str] = "No reason provided."):
+        if (ctx.guild.me.top_role.position > user.top_role.position 
+            and not user.guild_permissions.administrator):
+            await user.send(f"You got Banned for: {reason} by <@{ctx.author.id}>")
+            await user.ban(reason=reason)
+
+            embed = Embed(title=f"User Banned | {user}",
+                        color=0xDD2222,
+                        timestamp=datetime.utcnow())
+
+            embed=discord.Embed(title=f"User Banned | {user}", color=0xdd2222, timestamp=datetime.utcnow())
+            embed.set_thumbnail(url=user.avatar_url)
+            embed.add_field(name="User", value=f"<@{user.id}>", inline=True)
+            embed.add_field(name="Moderator", value=f"<@{ctx.author.id}>", inline=True)
+            embed.add_field(name="Reason", value="reason", inline=True)
+            embed.set_footer(text=f"ID: {user.id}")
+            await self.log_channel.send(embed=embed)
 
         else:
-            for target in targets:
-                if (ctx.guild.me.top_role.position > target.top_role.position 
-                    and not target.guild_permissions.administrator):
-                    await target.send(f"You got banned for: {reason} by {ctx.author.name}")
-                    await target.ban(reason=reason)
+            await ctx.send(f"{user.display_name} could not be Banned.")
 
-                    embed = Embed(title="Member banned",
-                                color=0xDD2222,
-                                timestamp=datetime.utcnow())
-
-                    embed.set_thumbnail(url=target.avatar_url)
-
-                    fields = [("Member", f"{target.name} a.k.a {target.display_name}", False),
-                            ("Actioned by", ctx.author.display_name, False),
-                            ("Reason", reason, False)]
-
-                    for name, value, inline in fields:
-                        embed.add_field(name=name, value=value, inline=inline)
-
-                    await target.send(f"You got banned for {reason} by {ctx.author.name}")
-
-
-                    await self.log_channel.send(embed=embed)
-                else:
-                    await ctx.send(f"{target.display_name} could not be banned.")
-
-            await ctx.send("Action complete.")
+        await ctx.send("Action complete.")
 
     @ban_members.error
     async def ban_members_error(self,ctx, exc):
@@ -302,7 +276,7 @@ class Mod(Cog):
             self.mute_role = self.bot.guild.get_role(809094530631991297)
             #pro life mute role: 809094530631991297
             #testing bot mute role: 830127409008869397
-            self.bot.cogs_ready.ready_up("mod")
+            #self.bot.cogs_ready.ready_up("mod")
 
 
     @Cog.listener()

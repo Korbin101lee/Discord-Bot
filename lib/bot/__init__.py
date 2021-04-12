@@ -21,7 +21,7 @@ from ..db import db
 
 OWNER_IDS = [805261413702041621]
 #COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
-COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
+#COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 TOKEN_TWO = "ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo"
@@ -36,53 +36,68 @@ STD_OUT = 808447994928037890
 
 
 def get_prefix(bot, message):
-	prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+    prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
     
-	return when_mentioned_or(prefix)(bot, message)
+    return when_mentioned_or(prefix)(bot, message)
 
 
-class Ready(object):
-    def __init__(self):
-        for cog in COGS:
-            setattr(self, cog, False)
 
-    def ready_up(self, cog):
-        setattr(self, cog, True)
-        print(f"{cog} cog ready")
 
-    def all_ready(self):
-        return all([getattr(self, cog) for cog in COGS])
+
+
+
 
 
 
 class Bot(BotBase):
     def __init__(self):
         self.ready = False
-        self.cogs_ready = Ready()
+        #self.cogs_ready = Ready()
         
         self.guild = None
         self.shceduler = AsyncIOScheduler()
 
         db.autosave(self.shceduler)
-        super().__init__(command_prefix=get_prefix, owner_ids=OWNER_IDS,intents=Intents.all())
+        self._cogs = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
+        super().__init__(command_prefix=get_prefix, case_insensitive=True, owner_ids=OWNER_IDS,intents=Intents.all())
+
+
+
+        
 
     async def process_commands(self, message):
-    	ctx = await self.get_context(message, cls=Context)
+        ctx = await self.get_context(message, cls=Context)
 
-    	if ctx.command is not None and ctx.guild is not None:
+        if ctx.command is not None and ctx.guild is not None:
 
-    		if not self.ready:
-    			await ctx.send("I'm not ready to receive commands. Please wait a few seconds.")
+            if not self.ready:
+                await ctx.send("I'm not ready to receive commands. Please wait a few seconds.")
 
-    		else:
-    			await self.invoke(ctx)
+            else:
+                await self.invoke(ctx)
 
-    def setup(self):
+    """def setup(self):
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
             print(f" {cog} cog loaded")
 
-        print("setup complete")
+        print("setup complete")"""
+
+    def ready_up(self, cog):
+        setattr(self, cog, True)
+        print(f"{cog} cog ready")
+
+    def all_ready(self):
+        return all([getattr(self, cog) for cog in self._cogs])
+
+    def setup(self):
+        print("Running setup...")
+
+        for cog in self._cogs:
+            self.load_extension(f"lib.cogs.{cog}")
+            print(f"Loaded `{cog}` cog.")
+
+        print("Setup complete.")
 
     def run(self, version):
         self.VERSION = version
@@ -100,8 +115,19 @@ class Bot(BotBase):
         await self.stdout.send("Remember to adhere to the rules! ")
 
 
+    async def shutdown(self):
+        print("Closing connection to Discord...")
+        await super().close()
+
+    async def close(self):
+        print("Closing on keyboard interrupt")
+        await self.shutdown()
+
     async def on_connect(self):
-        print(" bot connected")
+        print(f"Connected to Discord(latency: {self.latency*1000} ms).")
+
+    async def on_resume(self):
+        print("Bost resumed.")
 
     async def on_disconnected(self):
         print("bot disconnected")
@@ -110,33 +136,33 @@ class Bot(BotBase):
         if err == "on_command_error":
             await args[0].send("Something went wrong.")
 
-        await self.stdout.send("An error occured.")
+        #await self.stdout.send("An error occured.")
         raise
 
     
 
     async def on_command_error(self, ctx, exc):
-    	if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
-    		pass
+        if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
+            pass
 
-    	elif isinstance(exc, MissingRequiredArgument):
-    		await ctx.send("One or more required arguments are missing.")
+        elif isinstance(exc, MissingRequiredArgument):
+            await ctx.send("One or more required arguments are missing.")
 
-    	elif isinstance(exc, CommandOnCooldown):
-    		await ctx.send(f"That command is on {str(exc.cooldown.type).split('.')[-1]} cooldown. Try again in {exc.retry_after:,.2f} secs.")
+        elif isinstance(exc, CommandOnCooldown):
+            await ctx.send(f"That command is on {str(exc.cooldown.type).split('.')[-1]} cooldown. Try again in {exc.retry_after:,.2f} secs.")
 
-    	elif hasattr(exc, "original"):
-			# if isinstance(exc.original, HTTPException):
-			# 	await ctx.send("Unable to send message.")
+        elif hasattr(exc, "original"):
+            # if isinstance(exc.original, HTTPException):
+            # 	await ctx.send("Unable to send message.")
 
-    		if isinstance(exc.original, Forbidden):
-    			await ctx.send("I do not have permission to do that.")
+            if isinstance(exc.original, Forbidden):
+                await ctx.send("I do not have permission to do that.")
 
-    		else:
-    			raise exc.original
+            else:
+                raise exc.original
 
-    	else:
-    		raise exc
+        else:
+            raise exc
 
 
     async def on_ready(self):
@@ -147,8 +173,8 @@ class Bot(BotBase):
             self.shceduler.start()
 
 
-            while not self.cogs_ready.all_ready():
-                await sleep(0.5)
+            #while not self.cogs_ready.all_ready():
+            #    await sleep(0.5)
             #await self.stdout.send("Now online!")
             self.ready = True
             print(" bot ready")
@@ -182,6 +208,11 @@ class Bot(BotBase):
 
             else:
                 await self.process_commands(message)
+                
+
+
+
+    
 
     
 

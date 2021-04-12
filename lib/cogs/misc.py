@@ -45,10 +45,10 @@ class Misc(Cog):
 				self.bot.banlist.remove(target.id)
 			await ctx.send("Done.")
 
-	@Cog.listener()
-	async def on_ready(self):
-		if not self.bot.ready:
-			self.bot.cogs_ready.ready_up("misc")
+	#@Cog.listener()
+	#async def on_ready(self):
+		#if not self.bot.ready:
+			#self.bot.cogs_ready.ready_up("misc")
 
 
 def setup(bot):

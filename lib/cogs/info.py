@@ -75,10 +75,10 @@ class Info(Cog):
 
         await ctx.send(embed=embed)
 
-    @Cog.listener()
-    async def on_ready(self):
-        if not self.bot.ready:
-            self.bot.cogs_ready.ready_up("info")
+    #@Cog.listener()
+    #async def on_ready(self):
+        #if not self.bot.ready:
+            #self.bot.cogs_ready.ready_up("info")
 
 
 def setup(bot):
