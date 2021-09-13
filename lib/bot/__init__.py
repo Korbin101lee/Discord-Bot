@@ -7,6 +7,7 @@ from discord.ext.commands import when_mentioned_or, command, has_permissions
 
 from discord import Intents
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 from discord import Embed, File, DMChannel
 from discord.errors import HTTPException, Forbidden
 from discord.ext.commands import Context
@@ -24,13 +25,13 @@ OWNER_IDS = [805261413702041621]
 #COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
-TOKEN_TWO = "ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo"
+TOKEN_TWO = "ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc"
 #Pro-Life client ID: ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo
 #Bot-Testing client ID: ODI3OTg2MjE5NDU5MTQ5OTA1.YGjAQQ.B-kl3xS5NmIsIdQzTIHqUWRGWvM
-GUILD_ID = 808447993891389465
+GUILD_ID = 725187403253547040
 #Pro-Life server ID: 808447993891389465
 #Bot-Testing Server ID: 827970047297323019
-STD_OUT = 808447994928037890
+STD_OUT = 727758880238469190
 #Pro-Life channel ID: 808447994928037890
 #Bot-Testing channel ID: 827970047297323022
 

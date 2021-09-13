@@ -7,7 +7,6 @@ import os
 import discord
 from pathlib import Path
 
-from better_profanity import profanity
 from discord import Embed, Member, NotFound, Object
 from discord.utils import find
 from discord.ext.commands import Cog, Greedy, Converter
@@ -16,31 +15,21 @@ from discord.ext.commands import command, has_permissions, bot_has_permissions
 import re
 
 
-with open("./data/profanity.json") as f:
-    configData = json.load(f)
 
 
-bannedWords = configData["bannedWords"]
 
-import json
+
   
 # create a sample json
   
-a = {"name" : "GeeksforGeeks", "Topic" : "Json to String", "Method": 1}
   
 # Convert JSON to String
   
-y = json.dumps(bannedWords)
   
-print(y)
-print(type(y))
 
 
-profanity.load_censor_words_from_file("./data/profanity.json")
 
 
-def msg_contains_word(msg, word):
-    return re.search(fr'\b({word})\b', msg) is not None
 
 class Mod(Cog):
     def __init__(self, bot):
@@ -219,53 +208,7 @@ class Mod(Cog):
         else:
             await self.unmute(ctx, targets, reason=reason)
 
-    @command(name="addprofanity", aliases=["addswears", "addcurses"])
-    @has_permissions(manage_guild=True)
-    async def add_profanity(self, ctx, words):
-        if words.lower() in bannedWords:
-            await ctx.send("Already banned.")
-        else:
-            bannedWords.append(words.lower())
-
-            with open("./data/profanity.json", "r+") as f:
-                data = json.load(f)
-                data["bannedWords"] = bannedWords
-                f.seek(0)
-                f.write(json.dumps(data))
-                f.truncate()
-                print(f)
-                print(data)
-
-            #await ctx.message.delete()
-            #await ctx.send("Word added to banned words.")
-
-            
-
-            #profanity.load_censor_words_from_file("./data/profanity.json")
-            #print(profanity)
-            await ctx.send("word added.")
-
-    @command(name="delprofanity", aliases=["delswears", "delcurses"])
-    @has_permissions(manage_guild=True)
-    async def remove_profanity(self, ctx, words):
-        if words.lower() in bannedWords:
-            bannedWords.remove(words.lower())
-
-            with open("./data/profanity.json", "r+") as f:
-                data = json.load(f)
-                data["bannedWords"] = bannedWords
-                f.seek(0)
-                f.write(json.dumps(data))
-                f.truncate()
-
-            #await ctx.message.delete()
-            #await ctx.send("Word added to banned words.")
-
-            #profanity.load_censor_words_from_file("./data/profanity.json")
-            #print(profanity)
-            await ctx.send("word removed.")
-        else:
-            await ctx.send("Word isn't banned.")
+ 
 
     @Cog.listener()
     async def on_ready(self):
@@ -279,14 +222,10 @@ class Mod(Cog):
             #self.bot.cogs_ready.ready_up("mod")
 
 
-    @Cog.listener()
-    async def on_message(self, message):
-        messageAuthor = message.author
-        if bannedWords != None and (isinstance(message.channel, discord.channel.DMChannel) == False):
-            for bannedWord in bannedWords:
-                if msg_contains_word(message.content.lower(), bannedWord):
-                    await message.channel.send(f"{messageAuthor.mention} your message was removed as it contained a banned word.", delete_after=10)
-                    await message.delete()
+#    @Cog.listener()
+#    async def on_message(self, message):
+#        messageAuthor = message.author
+ 
 
 
 def setup(bot):
