@@ -25,7 +25,7 @@ OWNER_IDS = [805261413702041621]
 #COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
-TOKEN_TWO = "ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc"
+TOKEN_TWO = "ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ"
 #Pro-Life client ID: ODI4NzUxMTM0MDcxNzE3ODg4.YGuIow.z94e6h-SVwdzQnjJFaOrGPkmWBo
 #Bot-Testing client ID: ODI3OTg2MjE5NDU5MTQ5OTA1.YGjAQQ.B-kl3xS5NmIsIdQzTIHqUWRGWvM
 GUILD_ID = 725187403253547040
