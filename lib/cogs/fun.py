@@ -48,6 +48,26 @@ class Fun(Cog):
         await  ctx.message.delete()
         await ctx.send(message)
 
+    @command(name="anime")
+    @cooldown(1, 2, BucketType.member)
+    async def animal_fact(self, ctx, anime: str):
+        if (anime := anime.lower()) in ("wink", "pat", "hug"):
+            image_url = f"https://some-random-api.ml/animu/{'pat' if anime == 'pat' else anime}"
+            
+            async with request("GET", image_url, headers={}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    image_link = data["link"]
+
+                else:
+                    image_link = None
+            
+
+                if image_link is not None:
+                    embed.set_image(url=image_link)
+                await ctx.send(embed=embed)
+
+
     @command(name="fact")
     @cooldown(1, 2, BucketType.member)
     async def animal_fact(self, ctx, animal: str):
