@@ -15,16 +15,12 @@ class Welcome(Cog):
         #if not self.bot.ready:
             #self.bot.cogs_ready.ready_up("welcome")
 
-'''    @Cog.listener()
+    @Cog.listener()
     async def on_member_join(self, member):
         db.execute("INSERT INTO exp (UserID) VALUES (?)", member.id)
         await self.bot.get_channel(887417626324791316).send(f"**IF YOU RECEIVED A DM FROM ALTIDENTIFIER, PLEASE ANSWER THAT FIRST** \n\nHey {member.mention}, welcome to Pro-Life! Before you get access to the rest of the channels, we would like you to answer a few questions. Please post them below and wait for an admin to approve you, which will happen within 12 hours, depending on your timezone. Please read the <#887417510545223741> as well. \n\n**DO NOT PING ADMINS OR OWNERS!**\n\nQuestions:\n1-Are you Pro-Life?\n2-If yes to #1, what exceptions may you consider (life of the mother, rape, etc.)?\n3-Where did you learn of this server?\n4-Do you agree to the rules?\n\nHave a good time!")
         
-        try:
-            await member.send(f"Welcome to **{member.guild.name}**! Enjoy your stay!")
-        
-        except Forbidden:
-            pass
+
 
         await member.add_roles(member.guild.get_role(884274014388891678))
 
@@ -33,7 +29,7 @@ class Welcome(Cog):
     @Cog.listener()
     async def on_member_remove(self, member):
         db.execute("DELETE FROM exp WHERE UserID = ?", member.id)
-        pass'''
+        pass
 
 
 def setup(bot):
