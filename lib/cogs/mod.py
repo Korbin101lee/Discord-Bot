@@ -69,6 +69,15 @@ class Mod(Cog):
         if isinstance(exc, CheckFailure):
             await ctx.send("Insufficient permissions to perform that task.")
 
+    @command(name="verify")
+    @bot_has_permissions(manage_roles=True)
+    @has_permissions(manage_roles=True)
+    async def verify(ctx, member : discord.Member):
+        await member.remove_roles(member.guild.get_role(789324989027319838))
+        await member.add_roles(member.guild.get_role(725211551069503508))
+        await ctx.send(f"Welcome to the server {member.display_name} you can get roles in <#725187690554720328>")
+
+
     @command(name="ban")
     @bot_has_permissions(ban_members=True)
     @has_permissions(ban_members=True)
