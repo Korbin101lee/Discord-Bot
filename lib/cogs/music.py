@@ -208,9 +208,8 @@ class Player(wavelink.Player):
             self.queue.add(tracks[0])
             await ctx.send(f"Added {tracks[0].title} to the queue.")
         else:
-            if (track := await self.choose_track(ctx, tracks)) is not None:
-                self.queue.add(track)
-                await ctx.send(f"Added {track.uri} to the queue.")
+                self.queue.add(tracks[0])
+                await ctx.send(f"Added {tracks[0].uri} to the queue.")
         
         if not self.is_playing and not self.queue.is_empty:
             await self.start_playback()
@@ -221,7 +220,7 @@ class Player(wavelink.Player):
                 r.emoji in OPTIONS.keys()
                 and u == ctx.author
                 and r.message.id == msg.id
-            )
+            )#returns the emoji you selected with the song
 
         embed = discord.Embed(
             title="Choose a song",

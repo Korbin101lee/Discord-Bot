@@ -72,7 +72,7 @@ class Mod(Cog):
     @command(name="verify")
     @bot_has_permissions(manage_roles=True)
     @has_permissions(manage_roles=True)
-    async def verify(ctx, member : discord.Member):
+    async def verify(self, ctx, member : Member):
         await member.remove_roles(member.guild.get_role(789324989027319838))
         await member.add_roles(member.guild.get_role(725211551069503508))
         await ctx.send(f"Welcome to the server {member.display_name} you can get roles in <#725187690554720328>")
