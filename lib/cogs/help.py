@@ -114,8 +114,7 @@ class Help(Cog):
         embed.add_field(name="+Purge [limit]", value="Deletes a given amount of messages from the server", inline=False)
         embed.add_field(name="+Mute [user] [minutes] [reason]", value="Mutes a given member for a certain amount of time", inline=False)
         embed.add_field(name="+Unmute [user] [reason]", value="Unmutes a given member from the server", inline=False)
-        embed.add_field(name="+Addprofanity [words]", value="Adds profanity to the server to delete certain messages", inline=False)
-        embed.add_field(name="+Delprofanity [words]", value="Deletes progranity from the server to allow for certain words", inline=False)
+        embed.add_field(name="+Verify [user]", value="Verifys a member into the server", inline=False)
         await ctx.send(embed=embed)
 
     @command(name="help_music")
@@ -132,7 +131,7 @@ class Help(Cog):
         embed.add_field(name="+Skip", value="Skips the song", inline=False)
         embed.add_field(name="+Previous", value="Plays the previous song", inline=False)
         embed.add_field(name="+Shuffle", value="shuffles the queue", inline=False)
-        embed.add_field(name="+Repeat", value="repeats the queue", inline=False)
+        embed.add_field(name="+Repeat", value="repeats the same same song[1] or repeats all the songs[all]", inline=False)
         embed.add_field(name="+Queue", value="shows the bot's music queue", inline=False)
         embed.add_field(name="+np", value="shows the song that is now playing", inline=False)
         embed.add_field(name="+Volume", value="Changes Bot volume for the group from 0-150", inline=False)
@@ -141,7 +140,7 @@ class Help(Cog):
         embed.add_field(name="+adveq", value="Advanced eq allows you to change the vand and gain", inline=False)
         embed.add_field(name="+skipto", value="Allows you to skip to a certain song in the que", inline=False)
         embed.add_field(name="+restart", value="restarts the song currently playing", inline=False)
-        embed.add_field(name="+seek", value="seeks a time position in the current song playing", inline=False)
+        embed.add_field(name="+seek[min:sec]", value="seeks a time position in the current song playing", inline=False)
 
         await ctx.send(embed=embed)
 

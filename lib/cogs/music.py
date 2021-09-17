@@ -209,7 +209,19 @@ class Player(wavelink.Player):
             await ctx.send(f"Added {tracks[0].title} to the queue.")
         else:
                 self.queue.add(tracks[0])
-                await ctx.send(f"Added {tracks[0].uri} to the queue.")
+
+                embed=discord.Embed(title=f"{tracks[0].title}", url=f"{tracks[0].uri}")
+                embed.set_author(name="Added to queue", icon_url=ctx.message.author.avatar_url)
+                embed.set_thumbnail(url=f"{tracks[0].thumb}")
+                embed.add_field(name="Author", value=f"{tracks[0].author}", inline=True)
+                conver_seconds = tracks[0].length / 1000
+                m1, s1 = divmod(int(conver_seconds), 60)
+                song_length = f'{m1}:{s1:02}'
+                embed.add_field(name="Song Duration", value=song_length, inline=True)
+                
+                
+                await ctx.send(embed=embed)
+                #await ctx.send(f"Added {tracks[0].uri} to the queue") #{tracks[0].uri} to the queue.
         
         if not self.is_playing and not self.queue.is_empty:
             await self.start_playback()
@@ -354,6 +366,7 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         else:
             query = query.strip("<>")
             if not re.match(URL_REGEX, query):
+                await ctx.send(f":musical_note: Searching :mag_right: `{query}`")
                 query = f"ytsearch:{query}"
 
             await player.add_tracks(ctx, await self.wavelink.get_tracks(query))
