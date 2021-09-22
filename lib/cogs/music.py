@@ -218,7 +218,9 @@ class Player(wavelink.Player):
                 m1, s1 = divmod(int(conver_seconds), 60)
                 song_length = f'{m1}:{s1:02}'
                 embed.add_field(name="Song Duration", value=song_length, inline=True)
-                
+                PosInQueue = self.queue.length
+                embed.add_field(name="Position in queue", value=str(PosInQueue), inline=True)
+
                 
                 await ctx.send(embed=embed)
                 #await ctx.send(f"Added {tracks[0].uri} to the queue") #{tracks[0].uri} to the queue.
@@ -477,9 +479,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if upcoming := player.queue.upcoming:
             embed.add_field(
                 name="Next up",
-                value="\n".join(t.title for t in upcoming[:show]),
+                value="\n".join(t.title[t.uri] for t in upcoming[:show]),
                 inline=False
             )
+            
 
         msg = await ctx.send(embed=embed)
 
