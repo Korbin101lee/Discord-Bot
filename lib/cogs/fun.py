@@ -106,8 +106,8 @@ class Fun(Cog):
     async def Rules(self, ctx):
         embed= Embed(title="**Pro-Life**", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ", color=0x00aaff)
         embed.set_author(name="Pro-Life", icon_url="https://cdn.discordapp.com/icons/808447993891389465/61f30606d380c58a51323eba3957d00f.webp?size=128")
-        embed.add_field(name="**Rule 1: **", value="No harassment or bullying will be tolerated.", inline=False)
-        embed.add_field(name="**Rule 2: **", value="We do not mind friendly banter, but attacking or harassing anyone when they're clearly uncomfortable is unacceptable. It is up to the staff team's discretion on what is considered too excessive.", inline=False)
+        embed.add_field(name="**Rule 1: **", value="To be admitted into and remain in the server, you must be pro-life. ", inline=False)
+        embed.add_field(name="**Rule 2: **", value="No harassment or bullying will be tolerated.", inline=False)
         embed.add_field(name="**Rule 3: **", value="No graphic or sexually explicit media (pictures, gifs, videos, no rhino shit gif)", inline=False)
         embed.add_field(name="**Rule 4: **", value="Use the text and voice channels for their proper, designated use.", inline=False)
         embed.add_field(name="**Rule 5: **", value="No spamming, this includes bot spam.", inline=False)
