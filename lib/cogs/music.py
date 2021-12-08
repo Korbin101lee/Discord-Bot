@@ -464,25 +464,23 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             raise QueueIsEmpty
 
         embed = discord.Embed(
-            title="Queue",
-            description=f"Showing up to next {show} tracks",
-            colour=ctx.author.colour,
+            title=f"Queue for {ctx.guild.name}", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            colour=0xAD23D7,
             timestamp=dt.datetime.utcnow()
         )
-        embed.set_author(name="Query Results")
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         embed.add_field(
-            name="Currently playing",
+            name="__Now Playing:__",
             value=getattr(player.queue.current_track, "title", "No tracks currently playing."),
             inline=False
         )
+
         if upcoming := player.queue.upcoming:
             embed.add_field(
-                name="Next up",
-                value="\n".join(t.title[t.uri] for t in upcoming[:show]),
+                name="__Up Next:__",            
+                    value=f"\n".join(t.title for t in upcoming[:show]),
                 inline=False
             )
-            
 
         msg = await ctx.send(embed=embed)
 

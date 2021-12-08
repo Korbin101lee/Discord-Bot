@@ -73,9 +73,9 @@ class Mod(Cog):
     @bot_has_permissions(manage_roles=True)
     @has_permissions(manage_roles=True)
     async def verify(self, ctx, member : Member):
-        await member.remove_roles(member.guild.get_role(789324989027319838  ))
-        await member.add_roles(member.guild.get_role(725211551069503508))
-        await ctx.send(f"Welcome to the server, {member.display_name}! you can get roles in <#725193339028373586>")
+        await member.remove_roles(member.guild.get_role(918220652639576154))
+        await member.add_roles(member.guild.get_role(883145816158650453))
+        await ctx.send(f"Welcome to the server, {member.display_name}! you can get roles in <#883145817576333346>")
 
 
     @command(name="ban")
@@ -222,7 +222,7 @@ class Mod(Cog):
     @Cog.listener()
     async def on_ready(self):
         if not self.bot.ready:
-            self.log_channel = self.bot.get_channel(808563375944106074)
+            self.log_channel = self.bot.get_channel(887417626324791316)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
             self.mute_role = self.bot.guild.get_role(809094530631991297)

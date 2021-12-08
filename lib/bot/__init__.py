@@ -18,8 +18,6 @@ from apscheduler.triggers.cron import CronTrigger
 from ..db import db
 
 
-
-
 OWNER_IDS = [830576756002914394]
 #COGS = [Path.split("\\")[-1][:-3] for Path in glob("./lib/cogs/*.py")]
 #COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
@@ -29,10 +27,10 @@ IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 TOKEN_TWO = "ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ"
 #Pro-Life client ID: #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
 #Bot-Testing client ID: ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc
-GUILD_ID = 725187403253547040
+GUILD_ID = 883145816158650449
 #Pro-Life server ID: 808447993891389465
 #Bot-Testing Server ID: 827970047297323019
-STD_OUT = 727758880238469190
+STD_OUT = 884571811428331542
 #Pro-Life channel ID: 808447994928037890
 #Bot-Testing channel ID: 827970047297323022
 
@@ -58,7 +56,7 @@ class Bot(BotBase):
         
         self.guild = None
         self.shceduler = AsyncIOScheduler()
-
+        
         db.autosave(self.shceduler)
         self._cogs = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
         super().__init__(command_prefix=get_prefix, case_insensitive=True, owner_ids=OWNER_IDS,intents=Intents.all())
@@ -195,8 +193,6 @@ class Bot(BotBase):
                 embed = Embed(title="Modmail",
                               color=member.color,
                               timestamp = datetime.utcnow())
-
-                embed.set_thumbnail(url=member.avatar_url)
 
                 fields = [("Member", member.display_name, False),
                         ("Message", message.content, False)]
