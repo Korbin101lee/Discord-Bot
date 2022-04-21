@@ -25,20 +25,24 @@ IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
 TOKEN_TWO = "ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ"
+#Pro-Life 2 Client ID #OTI3Mjg1MTM0OTY3ODY1MzY1.YdH_lA.j8_UEMqqMg7TPNlxLVJzZcjPssc
 #Pro-Life client ID: #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
 #Bot-Testing client ID: ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc
-GUILD_ID = 883145816158650449
+GUILD_ID = 719251528556478524
 #Pro-Life server ID: 808447993891389465
 #Bot-Testing Server ID: 827970047297323019
-STD_OUT = 884571811428331542
+STD_OUT = 720291470245888110
 #Pro-Life channel ID: 808447994928037890
 #Bot-Testing channel ID: 827970047297323022
 
 
 def get_prefix(bot, message):
-    prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
+	db.execute(f"INSERT OR IGNORE INTO guilds(GuildID) VALUES({message.guild.id})")
+
+	prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
     
-    return when_mentioned_or(prefix)(bot, message)
+	return when_mentioned_or(prefix)(bot, message)
+
 
 
 

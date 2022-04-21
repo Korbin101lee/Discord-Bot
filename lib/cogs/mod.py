@@ -77,6 +77,16 @@ class Mod(Cog):
         await member.add_roles(member.guild.get_role(883145816158650453))
         await ctx.send(f"Welcome to the server, {member.display_name}! you can get roles in <#883145817576333346>")
 
+    @command(pass_context=True, name="unban_all")
+    @bot_has_permissions(ban_members=True)
+    @has_permissions(ban_members=True)
+    async def munban(self, ctx):
+        server=ctx.message.guild
+        ban_list = await self.bot.guild.bans()
+        print(ban_list)
+        await ctx.send('Unbanning {} members'.format(len(ban_list)))
+        for member in ban_list:
+            await ctx.guild.unban(member.user, reason="cause")
 
     @command(name="ban")
     @bot_has_permissions(ban_members=True)
