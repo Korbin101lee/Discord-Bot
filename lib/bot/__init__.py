@@ -25,7 +25,7 @@ OWNER_IDS = [830576756002914394]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
-TOKEN_TWO = "ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc"
+TOKEN_TWO = "ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ"
 #Pro-Life 2 Client ID #OTI3Mjg1MTM0OTY3ODY1MzY1.YdH_lA.j8_UEMqqMg7TPNlxLVJzZcjPssc
 #Pro-Life client ID: #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
 #Bot-Testing client ID: ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc
