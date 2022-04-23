@@ -5,6 +5,84 @@ import random
 import re
 import typing as t
 from enum import Enum
+import os
+from os.path import isfile
+from sqlite3 import connect
+from apscheduler.triggers.cron import CronTrigger
+
+from os import system
+
+from lib.db import db
+DB_PATH = "./data/db/songs.db"
+BUILD_PATH = "./data/db/build_songs.sql"
+
+cxn2 = connect(DB_PATH, check_same_thread=False)
+cur2 = cxn2.cursor()
+
+
+def with_commit2(func):
+    def inner(*args, **kwargs):
+        func(*args, **kwargs)
+        commit()
+
+    return inner
+
+
+@with_commit2
+def build2():
+    if isfile(BUILD_PATH):
+        scriptexec(BUILD_PATH)
+
+
+def commit():
+    cxn2.commit()
+
+
+def autosave(sched):
+    sched.add_job(commit, CronTrigger(second=0))
+
+
+
+def close():
+    cxn2.close()
+
+
+def field(command, *values):
+    cur2.execute(command,tuple(values))
+
+    if (fetch := cur2.fetchone()) is not None:
+        return fetch[0]
+
+
+def record(command, *values):
+    cur2.execute(command,tuple(values))
+
+
+    return cur2.fetchone()
+
+
+def records(command, *values):
+    cur2.execute(command,tuple(values))
+
+    return cur2.fetchall()
+
+def column(command, *values):
+    cur2.execute(command,tuple(values))
+
+    return [item[0] for item in cur2.fetchall()]
+
+
+def execute(command, *values):
+	cur2.execute(command, tuple(values))
+
+
+def multiexec(command,valueset):
+    cur2.executemany(command,valueset)
+
+
+def scriptexec(path):
+    with open(path, "r", encoding="utf-8") as script:
+        cur2.executescript(script.read())
 
 import aiohttp
 import discord
@@ -21,6 +99,8 @@ OPTIONS = {
     "4⃣": 3,
     "5⃣": 4,
 }
+
+
 
 
 class AlreadyConnectedToChannel(commands.CommandError):
@@ -192,7 +272,10 @@ class Player(wavelink.Player):
 
     async def teardown(self):
         try:
+            cur2.execute(f"DELETE FROM music_player")
+            cxn2.commit()
             await self.destroy()
+
         except KeyError:
             pass
 
@@ -213,6 +296,8 @@ class Player(wavelink.Player):
                 embed=discord.Embed(title=f"{tracks[0].title}", url=f"{tracks[0].uri}")
                 embed.set_author(name="Added to queue", icon_url=ctx.message.author.avatar_url)
                 embed.set_thumbnail(url=f"{tracks[0].thumb}")
+                cur2.execute(f"UPDATE music_player SET Track_Thumbnail = '{tracks[0].thumb}' WHERE Num = (SELECT MAX(Num) FROM music_player)")
+                cxn2.commit()
                 embed.add_field(name="Author", value=f"{tracks[0].author}", inline=True)
                 conver_seconds = tracks[0].length / 1000
                 m1, s1 = divmod(int(conver_seconds), 60)
@@ -269,6 +354,11 @@ class Player(wavelink.Player):
     async def advance(self):
         try:
             if (track := self.queue.get_next_track()) is not None:
+                cur2.execute(f"DELETE FROM music_player WHERE Num = 1")
+                cxn2.commit()
+
+                cur2.execute(f"UPDATE music_player SET Num = Num - 1")
+                cxn2.commit()
                 await self.play(track)
         except QueueIsEmpty:
             pass
@@ -334,6 +424,23 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="connect", aliases=["join"])
     async def connect_command(self, ctx, *, channel: t.Optional[discord.VoiceChannel]):
+        server_name = str(ctx.guild)
+        server_id = ctx.guild.id
+        Num = 0
+        #cur2.execute(f'delete from music_player where Server_ID ="{server_id}" and Server_Name = "{server_name}"')
+        #cxn2.commit()
+        user_name = str(ctx.message.author)
+        queue_name = f"Queue#{server_id}"
+        song_name = f"Song#{server_id}"
+        channel_id = ctx.message.author.voice.channel.id
+        channel_name = str(ctx.message.author.voice.channel)
+        qeue_num = 1
+        #thistuple = ("Num", "Server_ID", "Server_Name", "Voice_ID", "Voice_Name", "User_Name", "Next_Queue", "Queue_Name", "Song_Name")
+
+        #cur2.execute("insert into music_player(Num, Server_ID, Server_Name, Voice_ID, Voice_Name, User_Name, Next_Queue, Queue_Name, Song_Name) values(?, ?,?,?,?,?,?,?,?)",
+        #(Num, server_id, server_name, channel_id, channel_name, user_name, qeue_num , queue_name, song_name))
+        #cxn2.commit()
+
         player = self.get_player(ctx)
         channel = await player.connect(ctx, channel)
         await ctx.send(f"Connected to {channel.name}.")
@@ -353,6 +460,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
     @commands.command(name="play", aliases=["p"])
     async def play_command(self, ctx, *, query: t.Optional[str]):
+
+        server_name = str(ctx.guild)
+        server_id = ctx.guild.id
+        channel_id = ctx.message.author.voice.channel.id
+        channel_name = str(ctx.message.author.voice.channel)
+
+
+
         player = self.get_player(ctx)
 
         if not player.is_connected:
@@ -369,9 +484,14 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             query = query.strip("<>")
             if not re.match(URL_REGEX, query):
                 await ctx.send(f":musical_note: Searching :mag_right: `{query}`")
+                print (query)
+                cur2.execute(f"INSERT INTO music_player(User_Name, Song_Name) VALUES('{ctx.message.author}', '{query}')")
+                #cur2.execute(f"INSERT INTO music_player(Song_Name) VALUES('{query}')")
+                cxn2.commit()
+          
                 query = f"ytsearch:{query}"
-
             await player.add_tracks(ctx, await self.wavelink.get_tracks(query))
+#	db.execute(f"INSERT OR IGNORE INTO guilds(GuildID) VALUES({message.guild.id})")
 
     @play_command.error
     async def play_command_error(self, ctx, exc):
@@ -405,7 +525,6 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="next", aliases=["skip", "s"])
     async def next_command(self, ctx):
         player = self.get_player(ctx)
-
 
 
         await player.stop()
@@ -636,9 +755,12 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             value="\u200b",
             inline=False
         )
-        embed.add_field(name=f"`Requested by:`",
-        value=f"{ctx.author}",
-        inline=True)
+        thumnail = field("SELECT Track_Thumbnail FROM music_player")
+
+        embed.set_thumbnail(url=f"{thumnail}")
+
+        name = field("SELECT User_Name FROM music_player")
+        embed.add_field(name=f"`Requested by:`", value=f"{name}", inline=True)
         #  \u200b 
 
         await ctx.send(embed=embed)
