@@ -272,7 +272,7 @@ class Player(wavelink.Player):
 
     async def teardown(self):
         try:
-            cur2.execute(f"DELETE FROM music_player")
+            cur2.execute("DELETE FROM music_player")
             cxn2.commit()
             await self.destroy()
 
@@ -296,7 +296,7 @@ class Player(wavelink.Player):
                 embed=discord.Embed(title=f"{tracks[0].title}", url=f"{tracks[0].uri}")
                 embed.set_author(name="Added to queue", icon_url=ctx.message.author.avatar_url)
                 embed.set_thumbnail(url=f"{tracks[0].thumb}")
-                cur2.execute(f"UPDATE music_player SET Track_Thumbnail = '{tracks[0].thumb}' WHERE Num = (SELECT MAX(Num) FROM music_player)")
+                cur2.execute("UPDATE music_player SET Track_Thumbnail = ? WHERE Num = (SELECT MAX(Num) FROM music_player)", [tracks[0].thumb])                
                 cxn2.commit()
                 embed.add_field(name="Author", value=f"{tracks[0].author}", inline=True)
                 conver_seconds = tracks[0].length / 1000
@@ -354,10 +354,10 @@ class Player(wavelink.Player):
     async def advance(self):
         try:
             if (track := self.queue.get_next_track()) is not None:
-                cur2.execute(f"DELETE FROM music_player WHERE Num = 1")
+                cur2.execute("DELETE FROM music_player WHERE Num = 1")
                 cxn2.commit()
-
-                cur2.execute(f"UPDATE music_player SET Num = Num - 1")
+                Num = 1
+                cur2.execute("UPDATE music_player SET Num = ?", [Num - 1])
                 cxn2.commit()
                 await self.play(track)
         except QueueIsEmpty:
@@ -485,10 +485,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
             if not re.match(URL_REGEX, query):
                 await ctx.send(f":musical_note: Searching :mag_right: `{query}`")
                 print (query)
-                cur2.execute(f"INSERT INTO music_player(User_Name, Song_Name) VALUES('{ctx.message.author}', '{query}')")
+                cur2.execute("INSERT INTO music_player (User_Name, Song_Name) VALUES(?, ?)", (str(ctx.message.author), query))
                 #cur2.execute(f"INSERT INTO music_player(Song_Name) VALUES('{query}')")
                 cxn2.commit()
-          
+
                 query = f"ytsearch:{query}"
             await player.add_tracks(ctx, await self.wavelink.get_tracks(query))
 #	db.execute(f"INSERT OR IGNORE INTO guilds(GuildID) VALUES({message.guild.id})")

@@ -38,8 +38,7 @@ STD_OUT = 720291470245888110
 
 
 def get_prefix(bot, message):
-	db.execute(f"INSERT OR IGNORE INTO guilds(GuildID) VALUES('{message.guild.id}')")
-
+	db.execute("INSERT OR IGNORE INTO guilds(GuildID) VALUES(?)", message.guild.id)
 	prefix = db.field("SELECT Prefix FROM guilds WHERE GuildID = ?", message.guild.id)
     
 	return when_mentioned_or(prefix)(bot, message)

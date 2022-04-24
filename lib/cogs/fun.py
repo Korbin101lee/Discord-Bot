@@ -19,7 +19,7 @@ class Fun(Cog):
 
     @command(name="Robert")
     async def say_hello(self, ctx):
-        await ctx.send(f"Robert please be nice <:PrayTheTayAway:883906727291027486>")
+        await ctx.send(f"please be nice <:PrayTheTayAway:883906727291027486>")
 
     @command(name="dice", aliases=["roll"])
     @cooldown(1, 2, BucketType.member)
