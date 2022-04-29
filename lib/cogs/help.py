@@ -6,7 +6,7 @@ from discord.ext.menus import MenuPages, ListPageSource
 from discord.ext.commands import Cog
 from discord.ext.commands import command
 import discord
-from discord.ext.commands import command, has_permissions, bot_has_permissions
+from discord.ext.commands import command, has_permissions, bot_has_permissions, check_any, is_owner
 
 def syntax(command):
     cmd_and_aliases = "|".join([str(command), *command.aliases])
@@ -104,8 +104,8 @@ class Help(Cog):
             embed.add_field(name="+ServerInfo", value="Get's info of the given server", inline=False)
             await ctx.send(embed=embed)  
 
+    @check_any(is_owner(), has_permissions(manage_messages=True))
     @command(name="help_mod")
-    @has_permissions(manage_messages=True)
     async def help_mod(self, ctx):
         embed=discord.Embed(color=ctx.message.author.color)
         embed.set_author(name="Mod Plugin")
@@ -150,7 +150,7 @@ class Help(Cog):
         embed.set_author(name="Pro-Life Plugins Commands", icon_url="https://cdn.discordapp.com/avatars/828751134071717888/4d74c445b46ea32c77f88f241ba574c3.webp?size=1024")
         embed.add_field(name="Fun", value="`help_fun`", inline=True)
         embed.add_field(name="info", value="`help_info`", inline=True)
-        if ctx.message.author.guild_permissions.manage_messages:
+        if ctx.message.author.guild_permissions.manage_messages or ctx.message.author.id == 830576756002914394:
             embed.add_field(name="Mod", value="`help_mod`", inline=True)
         embed.add_field(name="Music", value="`help_music`", inline=True)
         await ctx.send(embed=embed)

@@ -1,7 +1,7 @@
 from discord import Member
 from discord.ext.commands import Cog, Greedy
 from discord.ext.commands import CheckFailure
-from discord.ext.commands import command, has_permissions
+from discord.ext.commands import check_any, is_owner, command, has_permissions
 
 from ..db import db
 
@@ -9,8 +9,8 @@ class Misc(Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
+	@check_any(is_owner(), has_permissions(manage_guild=True))
 	@command(name="prefix")
-	@has_permissions(manage_guild=True)
 	async def change_prefix(self, ctx, new: str):
 		if len(new) > 5:
 			await ctx.send("The prefix can not be more than 5 characters in length.")
@@ -24,8 +24,8 @@ class Misc(Cog):
 		if isinstance(exc, CheckFailure):
 			await ctx.send("You need the Manage Server permission to do that.")
 
+	@check_any(is_owner(), has_permissions(manage_guild=True))
 	@command(name="addban")
-	@has_permissions(manage_guild=True)
 	async def addban_command(self, ctx, targets: Greedy[Member]):
 		if not targets:
 			await ctx.send("No targets specified.")
@@ -35,7 +35,7 @@ class Misc(Cog):
 			await ctx.send("Done.")
 
 	@command(name="delban", aliases=["rmban"])
-	@has_permissions(manage_guild=True)
+	@check_any(is_owner(), has_permissions(manage_guild=True))
 	async def delban_command(self, ctx, targets: Greedy[Member]):
 		if not targets:
 			await ctx.send("No targets specified.")

@@ -287,27 +287,25 @@ class Player(wavelink.Player):
         
         if isinstance(tracks, wavelink.TrackPlaylist):
             self.queue.add(*tracks.tracks)
-        elif len(tracks) == 1:
+        else:            
             self.queue.add(tracks[0])
-            await ctx.send(f"Added {tracks[0].title} to the queue.")
-        else:
-                self.queue.add(tracks[0])
 
-                embed=discord.Embed(title=f"{tracks[0].title}", url=f"{tracks[0].uri}")
-                embed.set_author(name="Added to queue", icon_url=ctx.message.author.avatar_url)
-                embed.set_thumbnail(url=f"{tracks[0].thumb}")
-                cur2.execute("UPDATE music_player SET Track_Thumbnail = ? WHERE Num = (SELECT MAX(Num) FROM music_player)", [tracks[0].thumb])                
-                cxn2.commit()
-                embed.add_field(name="Author", value=f"{tracks[0].author}", inline=True)
-                conver_seconds = tracks[0].length / 1000
-                m1, s1 = divmod(int(conver_seconds), 60)
-                song_length = f'{m1}:{s1:02}'
-                embed.add_field(name="Song Duration", value=song_length, inline=True)
-                PosInQueue = self.queue.length
-                embed.add_field(name="Position in queue", value=str(PosInQueue), inline=True)
+            embed=discord.Embed(title=f"{tracks[0].title}", url=f"{tracks[0].uri}")
+            embed.set_author(name="Added to queue", icon_url=ctx.message.author.avatar_url)
+            embed.set_thumbnail(url=f"{tracks[0].thumb}")
+            #Track_Url
+            cur2.execute("UPDATE music_player SET Track_Thumbnail = ?, Track_Url = ? WHERE Num = (SELECT MAX(Num) FROM music_player)", ([tracks[0].thumb, tracks[0].uri]))                
+            cxn2.commit()
+            embed.add_field(name="Author", value=f"{tracks[0].author}", inline=True)
+            conver_seconds = tracks[0].length / 1000
+            m1, s1 = divmod(int(conver_seconds), 60)
+            song_length = f'{m1}:{s1:02}'
+            embed.add_field(name="Song Duration", value=song_length, inline=True)
+            PosInQueue = self.queue.length
+            embed.add_field(name="Position in queue", value=str(PosInQueue), inline=True)
 
                 
-                await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
                 #await ctx.send(f"Added {tracks[0].uri} to the queue") #{tracks[0].uri} to the queue.
         
         if not self.is_playing and not self.queue.is_empty:
@@ -582,6 +580,8 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         if player.queue.is_empty:
             raise QueueIsEmpty
 
+        song_url = field("SELECT Track_Url FROM music_player")
+
         embed = discord.Embed(
             title=f"Queue for {ctx.guild.name}", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             colour=0xAD23D7,
@@ -590,9 +590,10 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
         embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar_url)
         embed.add_field(
             name="__Now Playing:__",
-            value=getattr(player.queue.current_track, "title", "No tracks currently playing."),
+            value=f'[{getattr(player.queue.current_track, "title", "No tracks currently playing.")}]({song_url}) | ',
             inline=False
         )
+        print(player.queue.current_track)
 
         if upcoming := player.queue.upcoming:
             embed.add_field(
@@ -740,27 +741,25 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
 
         if not player.is_playing:
             raise PlayerIsAlreadyPaused
+        name = field("SELECT User_Name FROM music_player")
+
+        position = divmod(player.position, 60000)
+        length = divmod(player.queue.current_track.length, 60000)
 
         embed = discord.Embed(
             title=f"{player.queue.current_track.title}",
             url=f"{player.queue.current_track.uri}",
+            description = f"`{int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}`\n\n`Requested by:` {name}",
             colour=0x3498db,
         )
         embed.set_author(name="Now Playing ♪", icon_url="https://cdn.discordapp.com/avatars/828751134071717888/4d74c445b46ea32c77f88f241ba574c3.webp?size=1024")
 
-        position = divmod(player.position, 60000)
-        length = divmod(player.queue.current_track.length, 60000)
-        embed.add_field(
-            name=f"`{int(position[0])}:{round(position[1]/1000):02}/{int(length[0])}:{round(length[1]/1000):02}`",
-            value="\u200b",
-            inline=False
-        )
+
         thumnail = field("SELECT Track_Thumbnail FROM music_player")
 
         embed.set_thumbnail(url=f"{thumnail}")
 
-        name = field("SELECT User_Name FROM music_player")
-        embed.add_field(name=f"`Requested by:`", value=f"{name}", inline=True)
+        #embed.add_field(name=f"`Requested by:`", value=f"{name}", inline=True)
         #  \u200b 
 
         await ctx.send(embed=embed)

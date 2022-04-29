@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS music_player(
     Next_Queue integer,
     Queue_Name text,
     Song_Name text,
-    Track_Thumbnail text
+    Track_Thumbnail text,
+    Track_Url text
 );

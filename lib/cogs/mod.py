@@ -11,7 +11,7 @@ from discord import Embed, Member, NotFound, Object
 from discord.utils import find
 from discord.ext.commands import Cog, Greedy, Converter
 from discord.ext.commands import CheckFailure, BadArgument
-from discord.ext.commands import command, has_permissions, bot_has_permissions
+from discord.ext.commands import command, has_permissions, bot_has_permissions, check_any, is_owner
 import re
 
 
@@ -36,10 +36,9 @@ class Mod(Cog):
         self.bot = bot
 
         
-
-    @command(name="kick")
+    @check_any(is_owner(), has_permissions(kick_members=True))
     @bot_has_permissions(kick_members=True)
-    @has_permissions(kick_members=True)
+    @command(name="kick")
     async def kick_members(self, ctx, user: Member, *, reason: Optional[str] = "No reason provided."):
         if (ctx.guild.me.top_role.position > user.top_role.position 
             and not user.guild_permissions.administrator):
@@ -69,17 +68,19 @@ class Mod(Cog):
         if isinstance(exc, CheckFailure):
             await ctx.send("Insufficient permissions to perform that task.")
 
-    @command(name="verify")
+
+    @check_any(is_owner(), has_permissions(manage_roles=True))
     @bot_has_permissions(manage_roles=True)
-    @has_permissions(manage_roles=True)
+    @command(name="verify")
     async def verify(self, ctx, member : Member):
         await member.remove_roles(member.guild.get_role(918220652639576154))
         await member.add_roles(member.guild.get_role(883145816158650453))
         await ctx.send(f"Welcome to the server, {member.display_name}! you can get roles in <#883145817576333346>")
 
+
+    @check_any(is_owner(), has_permissions(ban_members=True))
     @command(pass_context=True, name="unban_all")
     @bot_has_permissions(ban_members=True)
-    @has_permissions(ban_members=True)
     async def munban(self, ctx):
         server=ctx.message.guild
         ban_list = await self.bot.guild.bans()
@@ -88,9 +89,9 @@ class Mod(Cog):
         for member in ban_list:
             await ctx.guild.unban(member.user, reason="cause")
 
+    @check_any(is_owner(), has_permissions(ban_members=True))
     @command(name="ban")
     @bot_has_permissions(ban_members=True)
-    @has_permissions(ban_members=True)
     async def ban_members(self, ctx, user: Member, *, reason: Optional[str] = "No reason provided."):
         if (ctx.guild.me.top_role.position > user.top_role.position 
             and not user.guild_permissions.administrator):
@@ -119,9 +120,9 @@ class Mod(Cog):
         if isinstance(exc, CheckFailure):
             await ctx.send("Insufficient permissions to perform that task.")
 
-    @command(name="purge")
+    @check_any(is_owner(), has_permissions(manage_messages=True))
     @bot_has_permissions(manage_messages=True)
-    @has_permissions(manage_messages=True)
+    @command(name="purge")
     async def clear_messages(self, ctx, targets:Greedy[Member], limit: Optional[int] = 1):
         def _check(message):
             return not len(targets) or message.author in targets
@@ -135,9 +136,9 @@ class Mod(Cog):
         else:
             await ctx.send("The limit provided is not within acceptable bounds.")
 
-    @command(name="mute")
+    @check_any(is_owner(), has_permissions(manage_roles=True))
     @bot_has_permissions(manage_roles=True)
-    @has_permissions(manage_roles=True)
+    @command(name="mute")
     async def mute_members(self, ctx, targets: Greedy[Member], minutes: Optional[int], *, 
                            reason: Optional[str] = "no reason provided."):
         if not len(targets):
@@ -217,9 +218,9 @@ class Mod(Cog):
 
                 await self.log_channel.send(embed=embed)                
 
-    @command(name="unmute")
+    @check_any(is_owner(), has_permissions(manage_roles=True))
     @bot_has_permissions(manage_roles=True)
-    @has_permissions(manage_roles=True)
+    @command(name="unmute")
     async def unmute_members(self, ctx, targets: Greedy[Member], *, reason: Optional[str] = "no reason provided."):
         if not len(targets):
             await ctx.send("One or more required arguments is missing.")
@@ -235,7 +236,7 @@ class Mod(Cog):
             self.log_channel = self.bot.get_channel(887417626324791316)
             #pro life log channel: 808563375944106074
             #testing bot log channel: 828785261449445486
-            self.mute_role = self.bot.guild.get_role(809094530631991297)
+            #self.mute_role = self.bot.guild.get_role(884274014388891678)
             #pro life mute role: 809094530631991297
             #testing bot mute role: 830127409008869397
             #self.bot.cogs_ready.ready_up("mod")
