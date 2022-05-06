@@ -352,11 +352,7 @@ class Player(wavelink.Player):
     async def advance(self):
         try:
             if (track := self.queue.get_next_track()) is not None:
-                cur2.execute("DELETE FROM music_player WHERE Num = 1")
-                cxn2.commit()
-                Num = 1
-                cur2.execute("UPDATE music_player SET Num = ?", [Num - 1])
-                cxn2.commit()
+
                 await self.play(track)
         except QueueIsEmpty:
             pass
@@ -523,6 +519,9 @@ class Music(commands.Cog, wavelink.WavelinkMixin):
     @commands.command(name="next", aliases=["skip", "s"])
     async def next_command(self, ctx):
         player = self.get_player(ctx)
+
+        cur2.execute("DELETE FROM music_player WHERE Num in (select Num FROM music_player LIMIT 1)")
+        cxn2.commit()
 
 
         await player.stop()
