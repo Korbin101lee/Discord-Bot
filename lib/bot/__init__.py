@@ -31,18 +31,12 @@ OWNER_IDS = [830576756002914394]
 #COGS = [p.stem for p in Path(".").glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
-#ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
-TOKEN_TWO = "ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ"
-#Pro-Life 2 Client ID #OTI3Mjg1MTM0OTY3ODY1MzY1.YdH_lA.j8_UEMqqMg7TPNlxLVJzZcjPssc
-#Pro-Life client ID: #ODMxOTY5NzE0MDAyNzIyODE2.YHc-LQ.msEMnZmXuLxgEkwbh2tunzqjJwQ
-#Bot-Testing client ID: ODg0MDkxNTYwOTgyMTEwMzA4.YTTcbQ.IdZJiKibnD0l7j6b8wbmvRzGHDc
+TOKEN_TWO = 
 GUILD_ID = 719251528556478524
 
-#Pro-Life server ID: 808447993891389465
-#Bot-Testing Server ID: 827970047297323019
+
 STD_OUT = 884113611444854925
-#Pro-Life channel ID: 808447994928037890
-#Bot-Testing channel ID: 827970047297323022
+
 import discord
 
 bot2 = discord.Client()#
